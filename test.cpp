@@ -76,22 +76,6 @@ void *main_thread(void *args)
 
 	std::cout << "[*] RedefineClasses result: " << (jvmti->RedefineClasses(1, &definition) ? "ERR" : "OK") << std::endl;
 
-	// jthread *threads;
-	// jthread curthread;
-	// jint count;
-	
-	// jvmti->GetAllThreads(&count, &threads);
-	// jvmti->GetCurrentThread(&curthread);
-
-	// for (jint i = 0; i < count; ++i) {
-	// 	auto thread = threads[i];
-	// 	if (thread == curthread)
-	// 		continue;
-
-	// 	std::cout << "[*] Popped frame for thread: " << thread << std::endl;
-	// 	jvmti->PopFrame(thread);
-	// }
-
 	// Register native method for hooking
 	JNINativeMethod method = {
 		const_cast<char *>("myFunction"), const_cast<char *>("(I)V"), reinterpret_cast<void *>(hkMyFunction)
