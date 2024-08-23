@@ -2,8 +2,9 @@ import java.io.File;
 import java.time.Duration;
 
 public class Target {
-    public static void myFunction() {
+    public static void myFunction(int number) {
         System.out.println("My function called!");
+        System.out.println("My number is: " + number);
     }
 
     public static void main(String[] args) throws Exception {
@@ -14,6 +15,6 @@ public class Target {
 
         Thread.sleep(1000);
 
-        myFunction(); // this call should be hooked by the library when it happens!
+        myFunction(10); // this call should be hooked by the library when it happens!
     }
 }

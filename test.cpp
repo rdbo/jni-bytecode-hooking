@@ -21,8 +21,11 @@ read_custom_class()
 	return vec;
 }
 
-JNIEXPORT jvalue JNICALL hkMyFunction() {
-	printf("myFunction was fully hooked from JNI!\n");
+JNIEXPORT jvalue JNICALL hkMyFunction(JNIEnv *env, jclass clazz, jint number) {
+	std::cout << "myFunction was fully hooked from JNI!" << std::endl;
+	std::cout << "env: " << env << std::endl;
+	std::cout << "class: " << clazz<< std::endl;
+	std::cout << "the original number was: " << number << std::endl;
 	return jvalue {};
 }
 
@@ -91,7 +94,7 @@ void *main_thread(void *args)
 
 	// Register native method for hooking
 	JNINativeMethod method = {
-		const_cast<char *>("myFunction"), const_cast<char *>("()V"), reinterpret_cast<void *>(hkMyFunction)
+		const_cast<char *>("myFunction"), const_cast<char *>("(I)V"), reinterpret_cast<void *>(hkMyFunction)
 	};
 	env->RegisterNatives(clazz, &method, 1);
 	
