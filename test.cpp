@@ -45,7 +45,7 @@ void *main_thread(void *args)
 	jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), NULL);
 	std::cout << "[*] JNIEnv: " << env << std::endl;
 
-	jvm->GetEnv(reinterpret_cast<void **>(&jvmti), JVMTI_VERSION_21);
+	jvm->GetEnv(reinterpret_cast<void **>(&jvmti), JVMTI_VERSION_1_2);
 	std::cout << "[*] JVMTI: " << jvmti << std::endl;
 
 	jvmti->GetPhase(&phase);
