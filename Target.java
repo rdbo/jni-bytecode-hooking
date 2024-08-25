@@ -7,6 +7,10 @@ public class Target {
         System.out.println("My number is: " + number);
     }
 
+    public static void myOtherFunction() {
+        System.out.println("MY OTHER FUNC ORIGINAL");
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("Target program started!");
 
@@ -16,5 +20,6 @@ public class Target {
         Thread.sleep(1000);
 
         myFunction(10); // this call should be hooked by the library when it happens!
+        myOtherFunction();
     }
 }

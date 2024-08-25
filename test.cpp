@@ -21,12 +21,17 @@ read_custom_class()
 	return vec;
 }
 
-JNIEXPORT jvalue JNICALL hkMyFunction(JNIEnv *env, jclass clazz, jint number) {
+JNIEXPORT void JNICALL hkMyFunction(JNIEnv *env, jclass clazz, jint number) {
 	std::cout << "myFunction was fully hooked from JNI!" << std::endl;
 	std::cout << "env: " << env << std::endl;
 	std::cout << "class: " << clazz<< std::endl;
 	std::cout << "the original number was: " << number << std::endl;
-	return jvalue {};
+}
+
+JNIEXPORT void JNICALL hkMyOtherFunction(JNIEnv *env, jclass clazz) {
+	std::cout << "myOtherFunction was fully hooked from JNI!" << std::endl;
+	std::cout << "env: " << env << std::endl;
+	std::cout << "class: " << clazz<< std::endl;
 }
 
 void *main_thread(void *args)
@@ -77,11 +82,11 @@ void *main_thread(void *args)
 	std::cout << "[*] RedefineClasses result: " << (jvmti->RedefineClasses(1, &definition) ? "ERR" : "OK") << std::endl;
 
 	// Register native method for hooking
-	JNINativeMethod method = {
-		const_cast<char *>("myFunction"), const_cast<char *>("(I)V"), reinterpret_cast<void *>(hkMyFunction)
+	JNINativeMethod methods[] = {
+		const_cast<char *>("myFunction"), const_cast<char *>("(I)V"), reinterpret_cast<void *>(hkMyFunction),
+		const_cast<char *>("myOtherFunction"), const_cast<char *>("()V"), reinterpret_cast<void *>(hkMyOtherFunction)
 	};
-	env->RegisterNatives(clazz, &method, 1);
-	
+	env->RegisterNatives(clazz, methods, 2);
 
 	jvm->DetachCurrentThread();
 

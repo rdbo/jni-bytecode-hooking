@@ -3,6 +3,9 @@ import java.io.File;
 public class Target {
     public static native void myFunction(int number);
 
+    public static native void myOtherFunction();
+    
+
     public static void main(String[] args) {
         System.out.println("Target program started!");
 
