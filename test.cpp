@@ -43,6 +43,8 @@ void *main_thread(void *args)
 	jclass clazz;
 	jvmtiCapabilities capabilities;
 	jvmtiPhase phase;
+	jmethodID myOtherFunction_method;
+	void *original_method;
 	
 	std::cout << "[*] Main thread started" << std::endl;
 
@@ -66,6 +68,14 @@ void *main_thread(void *args)
 	clazz = env->FindClass("Target");
 	std::cout << "[*] Target class: " << clazz << std::endl;
 
+	// Get original method before redefining
+	// Obsolete methods are kept in memory, so we can
+	// still call it by the old jmethodID
+	myOtherFunction_method = env->GetStaticMethodID(clazz, "myOtherFunction", "()V");
+	original_method = *(void **)myOtherFunction_method;
+	std::cout << "[*] Target.myOtherFunction: " << myOtherFunction_method << std::endl;
+	std::cout << "[*] *Target.myOtherFunction: " << *(void **)myOtherFunction_method << std::endl;
+
 	// Redefine Target class
 	auto hook_class = read_custom_class();
 	jvmtiClassDefinition definition = { clazz, static_cast<jint>(hook_class.size()), hook_class.data() };
@@ -79,6 +89,8 @@ void *main_thread(void *args)
 
 	std::cout << "]" << std::dec << std::endl;
 
+	std::cout << "[*] *Target.myOtherFunction: " << *(void **)myOtherFunction_method << std::endl;
+
 	std::cout << "[*] RedefineClasses result: " << (jvmti->RedefineClasses(1, &definition) ? "ERR" : "OK") << std::endl;
 
 	// Register native method for hooking
@@ -87,6 +99,16 @@ void *main_thread(void *args)
 		const_cast<char *>("myOtherFunction"), const_cast<char *>("()V"), reinterpret_cast<void *>(hkMyOtherFunction)
 	};
 	env->RegisterNatives(clazz, methods, 2);
+
+	// Try to call obsolete function
+	std::cout << "[*] *Target.myOtherFunction: " << *(void **)myOtherFunction_method << std::endl;
+
+	jmethodID orig = (jmethodID)&original_method;
+	jboolean is_obsolete;
+	jvmti->IsMethodObsolete(orig, &is_obsolete);
+	std::cout << "[*] Is myOtherFunction obsolete? " << (is_obsolete ? "yes" : "no") << std::endl;
+	env->CallStaticVoidMethod(clazz, orig);
+	std::cout << "[*] Called original method!!" << std::endl;
 
 	jvm->DetachCurrentThread();
 
